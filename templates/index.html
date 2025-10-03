@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Clima rápido</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    html, body { font-family: system-ui, Arial, sans-serif; margin: 0; padding: 0; }
+    .container { max-width: 760px; margin: 40px auto; padding: 20px; }
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,.05); }
+    label { display:block; margin: 10px 0 6px; font-weight:600; }
+    input, select, button { padding: 10px; font-size: 16px; }
+    .row { display:grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; }
+    .result { margin-top: 20px; padding: 16px; background:#fafafa; border:1px dashed #ccc; border-radius:10px; }
+    .muted { color:#666; font-size:14px; }
+    .badge { display:inline-block; padding:4px 8px; border-radius:999px; border:1px solid #ddd; font-size:12px; margin-left:8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌤️ Clima rápido (Flask + Requests + OpenWeather)</h1>
+
+    <div class="card">
+      <form method="POST" action="/weather">
+        <div class="row">
+          <div>
+            <label for="city">Ciudad</label>
+            <input id="city" name="city" type="text" placeholder="Ej. Tijuana, MX" required>
+          </div>
+          <div>
+            <label for="units">Unidades</label>
+            <select id="units" name="units">
+              <option value="metric" {{ 'selected' if default_units=='metric' else '' }}>Métrico (°C)</option>
+              <option value="imperial" {{ 'selected' if default_units=='imperial' else '' }}>Imperial (°F)</option>
+            </select>
+          </div>
+          <div>
+            <label for="lang">Idioma</label>
+            <select id="lang" name="lang">
+              <option value="es" {{ 'selected' if default_lang=='es' else '' }}>Español</option>
+              <option value="en" {{ 'selected' if default_lang=='en' else '' }}>Inglés</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:16px;">
+          <button type="submit">Consultar clima</button>
+          {% if from_cache %}
+          <span class="badge">cache</span>
+          {% endif %}
+        </div>
+      </form>
+
+      {% if error %}
+        <div class="result"><strong>Error:</strong> {{ error }}</div>
+      {% endif %}
+
+      {% if result %}
+        <div class="result">
+          <h2>{{ result.city }}</h2>
+          <p style="margin:6px 0;">
+            {% if result.icon %}
+              <img alt="icono clima" src="https://openweathermap.org/img/wn/{{ result.icon }}@2x.png">
+            {% endif %}
+            <strong>{{ result.temp }}°{{ 'C' if result.units=='metric' else 'F' }}</strong>
+            — {{ result.desc|capitalize }}
+          </p>
+          <p class="muted">
+            Sensación: {{ result.feels_like }}°{{ 'C' if result.units=='metric' else 'F' }} ·
+            Humedad: {{ result.humidity }}% ·
+            Presión: {{ result.pressure }} hPa ·
+            Viento: {{ result.wind_speed }} {{ 'm/s' if result.units=='metric' else 'mph' }}
+          </p>
+        </div>
+      {% endif %}
+    </div>
+
+    <p class="muted" style="margin-top:12px;">
+      Tip: prueba “Ciudad, Código de país” (ej. <em>Madrid, ES</em> o <em>Tijuana, MX</em>).
+    </p>
+  </div>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

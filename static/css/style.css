@@ -1,0 +1,135 @@
+/* ===== Paleta & base ===== */
+:root{
+  --bg: #f5f8ff;           /* fondo azul muy claro */
+  --card: #ffffff;         /* tarjetas */
+  --text: #0f172a;         /* azul marino oscuro (texto) */
+  --muted: #64748b;        /* gris azulado */
+  --border: #e2e8f0;       /* bordes sutiles */
+  --primary-50: #eff6ff;   /* azul muy claro */
+  --primary: #2563eb;      /* azul principal */
+  --primary-600: #1d4ed8;  /* hover */
+  --primary-700: #1e40af;  /* active/focus fuerte */
+  --accent: #38bdf8;       /* azul-cyan para detalles */
+  --radius: 14px;
+  --shadow: 0 10px 30px rgba(2, 6, 23, .08);
+}
+
+
+*{ box-sizing: border-box }
+html,body{ margin:0; padding:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:var(--text); background:var(--bg); }
+
+.container{ max-width: 900px; margin: 42px auto; padding: 20px; }
+.header{
+  background: linear-gradient(135deg, var(--primary-50) 0%, #e0f2fe 100%);
+  border:1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 20px;
+  box-shadow: var(--shadow);
+  display:flex; align-items:center; gap:14px;
+  animation: fadeIn .5s ease-out both;
+}
+.header h1{ margin:0; font-size: 1.4rem; }
+.header .badge{
+  display:inline-flex; align-items:center; gap:6px;
+  border:1px solid var(--border); color:var(--primary-700);
+  padding:4px 10px; border-radius:999px; font-size:.8rem;
+  background:#fff; box-shadow: 0 2px 10px rgba(37,99,235,.12);
+  animation: float 4s ease-in-out infinite;
+}
+
+.card{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-top: 16px;
+  animation: fadeInUp .5s ease-out both;
+}
+
+label{ display:block; margin: 10px 0 6px; font-weight:600; color:#0b1b3a; }
+input, select, button, textarea{
+  width: 100%;
+  border:1px solid var(--border);
+  background:#fff;
+  color:var(--text);
+  padding: 12px 12px;
+  border-radius: 12px;
+  font-size: 16px;
+  transition: border-color .2s, box-shadow .2s, transform .02s;
+}
+input:focus, select:focus, textarea:focus{
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(37,99,235,.15);
+}
+
+.row{ display:grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; }
+@media (max-width: 760px){
+  .row{ grid-template-columns: 1fr; }
+}
+
+button{
+  display:inline-flex; gap:8px; justify-content:center; align-items:center;
+  width:auto; cursor: pointer; user-select:none;
+  background: var(--primary);
+  color: #fff; border: none;
+  padding: 12px 16px; font-weight: 600;
+}
+button:hover{ background: var(--primary-600); }
+button:active{ transform: translateY(1px); background: var(--primary-700); }
+button[disabled]{ opacity:.7; cursor:not-allowed; }
+
+.result{
+  margin-top: 18px;
+  padding: 16px;
+  border:1px dashed var(--border);
+  border-radius: 12px;
+  background: #f8fbff;
+  min-height: 96px;
+}
+
+/* ===== Cargadores & animaciones ===== */
+.spinner{
+  width: 20px; height: 20px;
+  border: 3px solid var(--primary-50);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+
+.skeleton{
+  position: relative; overflow:hidden;
+  background: linear-gradient(90deg, #edf2ff 25%, #f9fbff 37%, #edf2ff 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 8px;
+}
+.skel-line{ height:14px; margin:10px 0; }
+.skel-line.tall{ height:24px; width:50%; }
+
+/* Fade-in de tarjetas/resultados */
+.pop-in{ animation: pop .35s ease-out both; }
+
+/* ===== Utilidades ===== */
+.muted{ color: var(--muted); font-size: .92rem; }
+.kpi{ display:inline-block; padding:6px 10px; background:#fff; border:1px solid var(--border); border-radius: 10px; }
+.kpi b{ color: var(--primary-700); }
+
+/* ===== Keyframes ===== */
+@keyframes fadeIn{ from{ opacity:0 } to{ opacity:1 } }
+@keyframes fadeInUp{ from{ opacity:0; transform: translateY(6px) } to{ opacity:1; transform: translateY(0) } }
+@keyframes pop{ from{ transform: scale(.98); opacity:.6 } to{ transform: scale(1); opacity:1 } }
+@keyframes spin{ to{ transform: rotate(360deg) } }
+@keyframes shimmer{
+  0%{ background-position: 200% 0 }
+  100%{ background-position: -200% 0 }
+}
+@keyframes float{
+  0%,100%{ transform: translateY(0) }
+  50%{ transform: translateY(-3px) }
+}
+
+
+
+
