@@ -1,84 +1,101 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   <title>Clima rápido</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <style>
-    html, body { font-family: system-ui, Arial, sans-serif; margin: 0; padding: 0; }
-    .container { max-width: 760px; margin: 40px auto; padding: 20px; }
-    .card { border: 1px solid #ddd; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,.05); }
-    label { display:block; margin: 10px 0 6px; font-weight:600; }
-    input, select, button { padding: 10px; font-size: 16px; }
-    .row { display:grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; }
-    .result { margin-top: 20px; padding: 16px; background:#fafafa; border:1px dashed #ccc; border-radius:10px; }
-    .muted { color:#666; font-size:14px; }
-    .badge { display:inline-block; padding:4px 8px; border-radius:999px; border:1px solid #ddd; font-size:12px; margin-left:8px; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- CSS -->
+  <link rel="stylesheet" href="/static/css/style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>🌤️ Clima rápido (Flask + Requests + OpenWeather)</h1>
+    <!-- Encabezado -->
+    <header class="header">
+      <div class="header-left">
+        <span class="badge">Eze-Weather</span>
+        <h1>🌤️ Clima al Instante</h1>
+      </div>
+      <div class="header-right">
+        <!-- Reloj local (del navegador) -->
+        <div class="clock" id="clock-local" title="Hora local">--:--:--</div>
+      </div>
+    </header>
 
-    <div class="card">
-      <form method="POST" action="/weather">
+    <!-- Tarjeta principal -->
+    <section class="card">
+      <!--
+        Formulario con:
+        - action="/weather" = fallback clásico si JS está desactivado
+        - id="form-weather" = para interceptar el submit en JS y evitar recarga
+        - Validaciones HTML5 + patrón permisivo (letras, acentos, espacios, números, comas, puntos, guiones, apóstrofes)
+      -->
+      <form id="form-weather" method="POST" action="/weather" novalidate>
         <div class="row">
           <div>
             <label for="city">Ciudad</label>
-            <input id="city" name="city" type="text" placeholder="Ej. Tijuana, MX" required>
+            <input
+              id="city"
+              name="city"
+              type="text"
+              placeholder="Ej. Tijuana, MX"
+              autocomplete="address-level2"
+              required
+              maxlength="80"
+              pattern="^[\\p{L}\\p{M}0-9\\s,'\\.\\-]{1,80}(,\\s?[A-Za-z]{2})?$"
+              title="Ejemplo válido: 'Tijuana' o 'Tijuana, MX'"
+            />
+            <small id="city-help" class="muted">
+              Formato sugerido: <b>Ciudad</b> o <b>Ciudad, Código de país</b> — ej. <em>Tijuana, MX</em>.
+            </small>
+            <div id="city-error" class="field-error" aria-live="polite"></div>
           </div>
+
           <div>
             <label for="units">Unidades</label>
             <select id="units" name="units">
-              <option value="metric" {{ 'selected' if default_units=='metric' else '' }}>Métrico (°C)</option>
-              <option value="imperial" {{ 'selected' if default_units=='imperial' else '' }}>Imperial (°F)</option>
+              <option value="metric" selected>Métrico (°C)</option>
+              <option value="imperial">Imperial (°F)</option>
             </select>
           </div>
+
           <div>
             <label for="lang">Idioma</label>
             <select id="lang" name="lang">
-              <option value="es" {{ 'selected' if default_lang=='es' else '' }}>Español</option>
-              <option value="en" {{ 'selected' if default_lang=='en' else '' }}>Inglés</option>
+              <option value="es" selected>Español</option>
+              <option value="en">Inglés</option>
             </select>
           </div>
         </div>
-        <div style="margin-top:16px;">
-          <button type="submit">Consultar clima</button>
-          {% if from_cache %}
-          <span class="badge">cache</span>
-          {% endif %}
+
+        <div class="actions">
+          <button type="submit" aria-describedby="city-help">
+            <span class="btn-label">Consultar clima</span>
+          </button>
+          <span class="muted tip">Tip: “Ciudad, Código de país” (Tijuana, MX)</span>
         </div>
       </form>
 
-      {% if error %}
-        <div class="result"><strong>Error:</strong> {{ error }}</div>
-      {% endif %}
+      <!-- Resultado dinámico (clima actual) -->
+      <div id="result" class="result muted" aria-live="polite">
+        Sin resultados aún. Ingresa una ciudad y consulta.
+      </div>
 
-      {% if result %}
-        <div class="result">
-          <h2>{{ result.city }}</h2>
-          <p style="margin:6px 0;">
-            {% if result.icon %}
-              <img alt="icono clima" src="https://openweathermap.org/img/wn/{{ result.icon }}@2x.png">
-            {% endif %}
-            <strong>{{ result.temp }}°{{ 'C' if result.units=='metric' else 'F' }}</strong>
-            — {{ result.desc|capitalize }}
-          </p>
-          <p class="muted">
-            Sensación: {{ result.feels_like }}°{{ 'C' if result.units=='metric' else 'F' }} ·
-            Humedad: {{ result.humidity }}% ·
-            Presión: {{ result.pressure }} hPa ·
-            Viento: {{ result.wind_speed }} {{ 'm/s' if result.units=='metric' else 'mph' }}
-          </p>
-        </div>
-      {% endif %}
-    </div>
+      <!-- Pronóstico 5 días (se inserta por JS) -->
+      <div id="forecast" aria-live="polite"></div>
+    </section>
 
-    <p class="muted" style="margin-top:12px;">
-      Tip: prueba “Ciudad, Código de país” (ej. <em>Madrid, ES</em> o <em>Tijuana, MX</em>).
-    </p>
+    <!-- Historial de búsquedas (se inserta por JS) -->
+    <div id="history-root"></div>
   </div>
-  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+  <!-- JS (AJAX). Si quitas este script, el formulario caerá al modo clásico con recarga -->
+  <script defer src="/static/js/app.js"></script>
+
+  <noscript>
+    <div class="noscript-note">
+      JavaScript desactivado: usarás el modo clásico (la página se recarga y el servidor renderiza el resultado).
+    </div>
+  </noscript>
 </body>
 </html>
+
