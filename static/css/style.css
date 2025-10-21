@@ -66,6 +66,18 @@ html,body{
   animation: float 4s ease-in-out infinite;
 }
 
+.chip,
+.clock,
+.kpi.hist-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:#fff;
+}
+
 .card{
   background:#fff;
   border:1px solid var(--border);
@@ -318,14 +330,10 @@ button[disabled]{ opacity:.7; cursor:not-allowed; }
 /* Reloj (chip) */
 .clock{
   font-variant-numeric: tabular-nums;
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius: 999px;
-  padding: 6px 10px;
+  min-width:92px;
+  justify-content:center;
   box-shadow: 0 2px 8px rgba(2,6,23,.06);
   color:#1e3a5f;
-  min-width: 92px;
-  text-align: center;
 }
 
 /* Pildorita de hora de la ciudad (opcional, dentro del resultado) */
@@ -334,48 +342,8 @@ button[disabled]{ opacity:.7; cursor:not-allowed; }
 }
 .kpi.clock-pill .dot{ font-size: 14px; }
 
-.header{ justify-content: space-between; }
-.header-right{ display:flex; align-items:center; gap:12px; }
-.clock{
-  font-variant-numeric: tabular-nums;
-  background:#fff; border:1px solid var(--border);
-  border-radius:999px; padding:6px 10px; min-width:92px; text-align:center;
-  box-shadow: 0 2px 8px rgba(2,6,23,.06); color:#1e3a5f;
-}
-.kpi.clock-pill{ display:inline-flex; align-items:center; gap:6px; }
-
 /* --- Chips del historial --- */
 .kpi { color: var(--text); }  /* asegura texto oscuro por defecto */
-
-.kpi.hist-btn{
-  background: var(--c4);       /* pasteles azules de tu paleta */
-  color: #1e3a5f;              /* texto más contrastado */
-  border-color: var(--c3);
-  transition: transform .05s, background-color .15s;
-}
-.kpi.hist-btn:hover{ background: var(--c3); }
-.kpi.hist-btn:active{ transform: translateY(1px); }
-.kpi.hist-btn:focus{
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(156, 177, 205, .45); /* focus visible */
-}
-
-/* Contenedor del historial (mejor separación) */
-.history-card .chip-list{
-  display:flex; flex-wrap:wrap; gap:10px;
-}
-
-/* --- Header: separa izquierda/derecha y acomoda el reloj --- */
-.header{ justify-content: space-between; }
-.header-left{ display:flex; align-items:center; gap:14px; }
-.header-right{ display:flex; align-items:center; gap:12px; }
-.clock{
-  font-variant-numeric: tabular-nums;
-  background:#fff; border:1px solid var(--border);
-  border-radius:999px; padding:6px 10px; min-width:92px; text-align:center;
-  box-shadow: 0 2px 8px rgba(2,6,23,.06); color:#1e3a5f;
-}
-
 
 .full-bleed{
   margin-left: calc(50% - 50vw);
@@ -390,12 +358,15 @@ button[disabled]{ opacity:.7; cursor:not-allowed; }
   margin-bottom: 8px;
 }
 .history-card .chip-list{
-  display:flex; flex-wrap:wrap; gap:10px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
 }
-
 .kpi.hist-btn{
-  display:inline-flex; align-items:center; gap:8px;
-  background: var(--c4); color:#1e3a5f; border-color: var(--c3);
+  gap:8px;
+  background: var(--c4);       /* pasteles azules de tu paleta */
+  color: #1e3a5f;              /* texto más contrastado */
+  border-color: var(--c3);
   transition: transform .05s, background-color .15s;
   cursor: pointer; user-select: none;
 }
