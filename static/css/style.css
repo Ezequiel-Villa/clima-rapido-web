@@ -216,10 +216,54 @@ button[disabled]{ opacity:.7; cursor:not-allowed; }
   transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
   will-change: transform;                 /* optimiza */
   transform-origin: center;
+  outline: none;
 }
-.forecast-card .day{ font-weight:700; color:#213a57; }
+.forecast-card-header{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  margin-bottom:8px;
+}
+.forecast-card h3{
+  margin:0;
+  font-size:1.05rem;
+  font-weight:700;
+  color:#213a57;
+}
 .forecast-card img{ width:64px; height:64px }
-.forecast-card .temps{ margin-top:6px; }
+.forecast-temps{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin:10px 0 6px;
+}
+.temp-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:.9rem;
+  font-weight:600;
+  letter-spacing:.01em;
+  border:1px solid transparent;
+}
+.temp-badge.max{
+  background: rgba(220, 72, 48, .12);
+  color:#b2341e;
+  border-color: rgba(220, 72, 48, .35);
+}
+.temp-badge.min{
+  background: rgba(47, 128, 237, .12);
+  color:#1f5c9c;
+  border-color: rgba(47, 128, 237, .35);
+}
+.forecast-card:focus-visible{
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 12px 24px rgba(13, 29, 54, .12), 0 0 0 3px rgba(156, 177, 205, .45);
+  border-color: var(--c3);
+}
 
 /* Hover: zoom + sombra */
 @media (hover: hover) and (pointer: fine){
