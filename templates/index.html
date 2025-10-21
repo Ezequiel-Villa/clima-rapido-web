@@ -149,8 +149,12 @@
         {% if forecast5 %}
           <section class="forecast-grid">
             {% for day in forecast5 %}
-              <article class="forecast-day">
-                <header>
+              <article
+                class="forecast-card"
+                tabindex="0"
+                aria-label="Pronóstico para {{ day.day }} ({{ day.date }})"
+              >
+                <header class="forecast-card-header">
                   <h3>{{ day.day }}</h3>
                   <p class="muted">{{ day.date }}</p>
                 </header>
@@ -163,10 +167,10 @@
                     loading="lazy"
                   />
                 {% endif %}
-                <p class="forecast-temps">
-                  <span class="max">▲ {{ day.temp_max }} {% if result and result.units == "imperial" %}°F{% else %}°C{% endif %}</span>
-                  <span class="min">▼ {{ day.temp_min }} {% if result and result.units == "imperial" %}°F{% else %}°C{% endif %}</span>
-                </p>
+                <div class="forecast-temps" role="group" aria-label="Temperaturas máxima y mínima">
+                  <span class="temp-badge max" aria-label="Temperatura máxima">▲ {{ day.temp_max }} {% if result and result.units == "imperial" %}°F{% else %}°C{% endif %}</span>
+                  <span class="temp-badge min" aria-label="Temperatura mínima">▼ {{ day.temp_min }} {% if result and result.units == "imperial" %}°F{% else %}°C{% endif %}</span>
+                </div>
                 {% if day.pop is not none %}
                   <p class="muted">Prob. precipitación: {{ (day.pop * 100) | round(0) }}%</p>
                 {% endif %}
