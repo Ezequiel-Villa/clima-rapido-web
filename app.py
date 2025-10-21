@@ -267,8 +267,8 @@ def weather():
                                result=None,
                                forecast5=None,
                                error=str(e),
-                               default_units=DEFAULT_UNITS,
-                               default_lang=DEFAULT_LANG,
+                               default_units=units,
+                               default_lang=lang,
                                from_cache=False)
 
 # ------------------------------

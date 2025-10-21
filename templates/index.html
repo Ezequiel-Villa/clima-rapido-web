@@ -53,16 +53,16 @@
           <div>
             <label for="units">Unidades</label>
             <select id="units" name="units">
-              <option value="metric" selected>Métrico (°C)</option>
-              <option value="imperial">Imperial (°F)</option>
+              <option value="metric" {{ 'selected' if default_units == 'metric' else '' }}>Métrico (°C)</option>
+              <option value="imperial" {{ 'selected' if default_units == 'imperial' else '' }}>Imperial (°F)</option>
             </select>
           </div>
 
           <div>
             <label for="lang">Idioma</label>
             <select id="lang" name="lang">
-              <option value="es" selected>Español</option>
-              <option value="en">Inglés</option>
+              <option value="es" {{ 'selected' if default_lang == 'es' else '' }}>Español</option>
+              <option value="en" {{ 'selected' if default_lang == 'en' else '' }}>Inglés</option>
             </select>
           </div>
         </div>
