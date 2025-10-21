@@ -47,6 +47,16 @@ def _weekday_es(date_str):
     dias = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
     return dias[dt.weekday()]
 
+
+def _format_local_time(timestamp, tz_offset):
+    """Convierte timestamps UTC a hora local (HH:MM) usando el offset suministrado."""
+    if not timestamp:
+        return None
+    try:
+        return datetime.utcfromtimestamp(timestamp + tz_offset).strftime("%H:%M")
+    except (TypeError, ValueError, OSError):
+        return None
+
 def summarize_forecast(forecast_json):
     """
     Recibe el JSON del endpoint /forecast (bloques de 3h por ~5 días)
@@ -240,6 +250,7 @@ def weather():
         weather_list = data_current.get("weather", [])
         wind = data_current.get("wind", {})
 
+        tz_offset = data_current.get("timezone", 0) or 0
         result = {
             "city": f"{name}, {country}" if country else name,
             "temp": main.get("temp"),
@@ -250,7 +261,43 @@ def weather():
             "icon": weather_list[0]["icon"] if weather_list else None,
             "wind_speed": wind.get("speed"),
             "units": units,  # para mostrar °C u °F
+            "sunrise": _format_local_time(sys.get("sunrise"), tz_offset),
+            "sunset": _format_local_time(sys.get("sunset"), tz_offset),
+            "clouds": data_current.get("clouds", {}).get("all"),
         }
+
+        insights = []
+        if result["sunrise"]:
+            insights.append({
+                "title": "Amanecer",
+                "value": result["sunrise"],
+                "description": "Hora local estimada del amanecer",
+            })
+        if result["sunset"]:
+            insights.append({
+                "title": "Atardecer",
+                "value": result["sunset"],
+                "description": "Hora local estimada del atardecer",
+            })
+        if result["clouds"] is not None:
+            insights.append({
+                "title": "Nubosidad",
+                "value": f"{result['clouds']} %",
+                "description": "Cobertura de nubes reportada",
+            })
+
+        if result["sunrise"] and result["sunset"]:
+            daylight_seconds = (sys.get("sunset") or 0) - (sys.get("sunrise") or 0)
+            if daylight_seconds > 0:
+                hours, remainder = divmod(daylight_seconds, 3600)
+                minutes = remainder // 60
+                insights.append({
+                    "title": "Duración del día",
+                    "value": f"{int(hours)}h {int(minutes):02d}m",
+                    "description": "Intervalo entre amanecer y atardecer",
+                })
+
+        result["insights"] = insights
 
         # Pronóstico 5 días (resumen diario)
         forecast5, from_cache_forecast = fetch_forecast(city, units, lang)
@@ -298,6 +345,7 @@ def weather_api():
         m = cw.get("main", {})
         wind = cw.get("wind", {})
 
+        tz_offset = cw.get("timezone", 0) or 0
         result = {
             "city": f'{cw.get("name", city)}, {cw.get("sys",{}).get("country","")}'.strip(", "),
             "temp": m.get("temp"),
@@ -311,6 +359,46 @@ def weather_api():
             "tz_offset": cw.get("timezone"),  # segundos de diferencia vs UTC
             "dt": cw.get("dt"),               # timestamp base (UTC) de la medición
         }
+        result.update({
+            "sunrise": _format_local_time(cw.get("sys", {}).get("sunrise"), tz_offset),
+            "sunset": _format_local_time(cw.get("sys", {}).get("sunset"), tz_offset),
+            "clouds": cw.get("clouds", {}).get("all"),
+        })
+
+        insights = []
+        if result["sunrise"]:
+            insights.append({
+                "title": "Amanecer",
+                "value": result["sunrise"],
+                "description": "Hora local estimada del amanecer",
+            })
+        if result["sunset"]:
+            insights.append({
+                "title": "Atardecer",
+                "value": result["sunset"],
+                "description": "Hora local estimada del atardecer",
+            })
+        if result["clouds"] is not None:
+            insights.append({
+                "title": "Nubosidad",
+                "value": f"{result['clouds']} %",
+                "description": "Cobertura de nubes reportada",
+            })
+
+        sys_block = cw.get("sys", {})
+        sunrise_raw = sys_block.get("sunrise")
+        sunset_raw = sys_block.get("sunset")
+        if sunrise_raw and sunset_raw and sunrise_raw < sunset_raw:
+            daylight_seconds = sunset_raw - sunrise_raw
+            hours, remainder = divmod(daylight_seconds, 3600)
+            minutes = remainder // 60
+            insights.append({
+                "title": "Duración del día",
+                "value": f"{int(hours)}h {int(minutes):02d}m",
+                "description": "Intervalo entre amanecer y atardecer",
+            })
+
+        result["insights"] = insights
         return jsonify({"result": result, "from_cache": from_cache})
     except Exception as e:
         return jsonify({"error": str(e)}), 400

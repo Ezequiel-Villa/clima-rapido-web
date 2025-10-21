@@ -139,6 +139,24 @@
               <p class="muted cache-indicator">Datos servidos desde caché.</p>
             {% endif %}
           </article>
+          {% if result.insights %}
+            <section class="insights" aria-label="Indicadores adicionales del clima">
+              <h3>Indicadores destacados</h3>
+              <div class="insights-grid">
+                {% for insight in result.insights %}
+                  <article class="insight-card">
+                    <h4>{{ insight.title }}</h4>
+                    {% if insight.value %}
+                      <p class="insight-value">{{ insight.value }}</p>
+                    {% endif %}
+                    {% if insight.description %}
+                      <p class="muted">{{ insight.description }}</p>
+                    {% endif %}
+                  </article>
+                {% endfor %}
+              </div>
+            </section>
+          {% endif %}
         {% else %}
           <p>Sin resultados aún. Ingresa una ciudad y consulta.</p>
         {% endif %}

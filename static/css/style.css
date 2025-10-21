@@ -198,6 +198,66 @@ button[disabled]{ opacity:.7; cursor:not-allowed; }
   }
 }
 
+/* ===== Indicadores adicionales ===== */
+.insights{
+  margin-top: 20px;
+  display: grid;
+  gap: 14px;
+}
+
+.insights h3{
+  margin: 0;
+  font-size: 1.1rem;
+  color: #213a57;
+}
+
+.insights-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.insight-card{
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, .08);
+  display: grid;
+  gap: 6px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.insight-card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, .12);
+}
+
+.insight-card h4{
+  margin: 0;
+  font-size: 1rem;
+  color: #21486c;
+}
+
+.insight-value{
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+@media (max-width: 720px){
+  .insights-grid{
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+}
+
+@media (max-width: 520px){
+  .insights-grid{
+    grid-template-columns: 1fr;
+  }
+}
+
 .cache-indicator{
   margin-top:8px;
   font-size:.95rem;
