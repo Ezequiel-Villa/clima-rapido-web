@@ -77,11 +77,110 @@
 
       <!-- Resultado dinámico (clima actual) -->
       <div id="result" class="result muted" aria-live="polite">
-        Sin resultados aún. Ingresa una ciudad y consulta.
+        {% if error %}
+          <div class="error" role="alert">
+            <strong>Ocurrió un error:</strong>
+            <span>{{ error }}</span>
+          </div>
+        {% elif result %}
+          {% set temp_unit = "°C" if result.units == "metric" else "°F" if result.units == "imperial" else "K" %}
+          <article class="weather-current">
+            <header class="weather-header">
+              <div class="weather-location">
+                <h2>{{ result.city }}</h2>
+                <p class="muted">{{ result.desc | capitalize }}</p>
+              </div>
+              {% if result.icon %}
+                <img
+                  src="https://openweathermap.org/img/wn/{{ result.icon }}@2x.png"
+                  alt="Icono del clima: {{ result.desc }}"
+                  width="80"
+                  height="80"
+                  loading="lazy"
+                />
+              {% endif %}
+            </header>
+            <dl class="weather-details">
+              {% if result.temp is not none %}
+                <div>
+                  <dt>Temperatura</dt>
+                  <dd>{{ result.temp }} {{ temp_unit }}</dd>
+                </div>
+              {% endif %}
+              {% if result.feels_like is not none %}
+                <div>
+                  <dt>Sensación</dt>
+                  <dd>{{ result.feels_like }} {{ temp_unit }}</dd>
+                </div>
+              {% endif %}
+              {% if result.humidity is not none %}
+                <div>
+                  <dt>Humedad</dt>
+                  <dd>{{ result.humidity }} %</dd>
+                </div>
+              {% endif %}
+              {% if result.pressure is not none %}
+                <div>
+                  <dt>Presión</dt>
+                  <dd>{{ result.pressure }} hPa</dd>
+                </div>
+              {% endif %}
+              {% if result.wind_speed is not none %}
+                <div>
+                  <dt>Viento</dt>
+                  <dd>
+                    {{ result.wind_speed }}
+                    {% if result.units == "imperial" %}mph{% else %}m/s{% endif %}
+                  </dd>
+                </div>
+              {% endif %}
+            </dl>
+            {% if from_cache %}
+              <p class="muted cache-indicator">Datos servidos desde caché.</p>
+            {% endif %}
+          </article>
+        {% else %}
+          <p>Sin resultados aún. Ingresa una ciudad y consulta.</p>
+        {% endif %}
       </div>
 
       <!-- Pronóstico 5 días (se inserta por JS) -->
-      <div id="forecast" aria-live="polite"></div>
+      <div id="forecast" aria-live="polite">
+        {% if forecast5 %}
+          <section class="forecast-grid">
+            {% for day in forecast5 %}
+              <article class="forecast-day">
+                <header>
+                  <h3>{{ day.day }}</h3>
+                  <p class="muted">{{ day.date }}</p>
+                </header>
+                {% if day.icon %}
+                  <img
+                    src="https://openweathermap.org/img/wn/{{ day.icon }}@2x.png"
+                    alt="Pronóstico: {{ day.desc }}"
+                    width="60"
+                    height="60"
+                    loading="lazy"
+                  />
+                {% endif %}
+                <p class="forecast-temps">
+                  <span class="max">▲ {{ day.temp_max }} {% if result and result.units == "imperial" %}°F{% else %}°C{% endif %}</span>
+                  <span class="min">▼ {{ day.temp_min }} {% if result and result.units == "imperial" %}°F{% else %}°C{% endif %}</span>
+                </p>
+                {% if day.pop is not none %}
+                  <p class="muted">Prob. precipitación: {{ (day.pop * 100) | round(0) }}%</p>
+                {% endif %}
+                {% if day.desc %}
+                  <p class="muted">{{ day.desc | capitalize }}</p>
+                {% endif %}
+              </article>
+            {% endfor %}
+          </section>
+          {% if from_cache %}
+            <p class="muted cache-indicator">Pronóstico obtenido desde caché.</p>
+          {% endif %}
+        {% endif %}
+      </div>
     </section>
 
     <!-- Historial de búsquedas (se inserta por JS) -->
@@ -98,4 +197,3 @@
   </noscript>
 </body>
 </html>
-
